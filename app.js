@@ -73,8 +73,12 @@ app.post('/generate-invoice', upload.array('workImages', 10), async (req, res) =
             margin: 50
         });
 
-        const writeStream = fs.createWriteStream(pdfPath);
-        doc.pipe(writeStream);
+        // Set the response headers for PDF
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+        // Pipe the PDF directly to the response
+        doc.pipe(res);
         
         // Company Header - Large and centered
         doc.fontSize(28)
@@ -259,23 +263,17 @@ app.post('/generate-invoice', upload.array('workImages', 10), async (req, res) =
                align: 'center'
            });
 
-        // Finalize PDF - only call doc.end() once!
+        // End the document
         doc.end();
 
-        // Wait for the write stream to finish
-        writeStream.on('finish', () => {
-            // Send the PDF directly to the client
-            res.download(pdfPath, filename, (err) => {
-                if (err) {
-                    console.error('Error sending file:', err);
-                    res.status(500).send('Error downloading file');
-                }
-                // Cleanup
-                fs.unlink(pdfPath, (unlinkErr) => {
-                    if (unlinkErr) console.error('Error cleaning up file:', unlinkErr);
+        // Cleanup the uploaded files after sending
+        if (req.files) {
+            req.files.forEach(file => {
+                fs.unlink(file.path, (err) => {
+                    if (err) console.error('Error cleaning up file:', err);
                 });
             });
-        });
+        }
 
     } catch (error) {
         console.error('Error generating invoice:', error);
