@@ -188,26 +188,28 @@ app.post('/generate-invoice', upload, async (req, res) => {
         doc.fontSize(10)
            .fillColor('#333333');
 
-        // PayPal - no link, just text
+        // PayPal
         doc.text('PayPal:', 70, paymentY)
-           .text('Atommsolhl@gmail.com', 170, paymentY);
+           .fillColor('#333333')
+           .text(process.env.PAYPAL_EMAIL || '[PayPal email]', 170, paymentY);
 
-        // Venmo - keep as clickable link
-        const venmoLink = 'https://venmo.com/Atomm-sol';
+        // Venmo
+        const venmoLink = `https://venmo.com/${process.env.VENMO_HANDLE || '[Venmo handle]'}`;
         doc.text('Venmo:', 70, paymentY + 20)
            .fillColor('#0000FF')
-           .text('@Atomm-sol', 170, paymentY + 20, { link: venmoLink })
+           .text(process.env.VENMO_HANDLE || '[Venmo handle]', 170, paymentY + 20, { link: venmoLink })
            .fillColor('#333333');
 
-        // Zelle - no link, just text
+        // Zelle
         doc.text('Zelle:', 70, paymentY + 40)
-           .text('Atommsolhl@gmail.com', 170, paymentY + 40);
+           .fillColor('#333333')
+           .text(process.env.ZELLE_EMAIL || '[Zelle email]', 170, paymentY + 40);
 
-        // Cash App - keep as clickable link
-        const cashAppLink = 'https://cash.app/$atommsol';
+        // Cash App
+        const cashAppLink = `https://cash.app/${process.env.CASHAPP_HANDLE || '[Cash App handle]'}`;
         doc.text('Cash App:', 70, paymentY + 60)
            .fillColor('#0000FF')
-           .text('$atommsol', 170, paymentY + 60, { link: cashAppLink })
+           .text(process.env.CASHAPP_HANDLE || '[Cash App handle]', 170, paymentY + 60, { link: cashAppLink })
            .fillColor('#333333');
 
         // Add images if any
