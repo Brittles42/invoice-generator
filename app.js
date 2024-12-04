@@ -55,8 +55,7 @@ const transporter = nodemailer.createTransport({
 // Add basic authentication
 app.use(basicAuth({
     users: { 
-        'admin': 'yourpassword123',  // Add more users as needed
-        'user2': 'anotherpassword'
+        [process.env.ADMIN_USER]: process.env.ADMIN_PASSWORD 
     },
     challenge: true,
     realm: 'Invoice Generator'
