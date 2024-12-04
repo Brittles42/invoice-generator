@@ -53,6 +53,10 @@ const transporter = nodemailer.createTransport({
 
 // Routes
 app.get('/', (req, res) => {
+    res.redirect('/invoice');
+});
+
+app.get('/invoice', (req, res) => {
     res.render('invoice');
 });
 
