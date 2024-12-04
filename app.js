@@ -186,7 +186,9 @@ app.post('/generate-invoice', upload.array('workImages', 10), async (req, res) =
         // PayPal
         doc.text('PayPal:', 70, paymentY)
            .fillColor('#333333')
-           .text(process.env.PAYPAL_EMAIL || '[PayPal email]', 170, paymentY);
+           .text(process.env.PAYPAL_LINK || '[PayPal link]', 170, paymentY, {
+               link: process.env.PAYPAL_LINK
+           });
 
         // Venmo
         const venmoLink = `https://venmo.com/${process.env.VENMO_HANDLE || '[Venmo handle]'}`;
