@@ -4,7 +4,6 @@ const path = require('path');
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const nodemailer = require('nodemailer');
-const basicAuth = require('express-basic-auth');
 const app = express();
 
 // Set up multer for file uploads
@@ -51,15 +50,6 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASS  // Add your app password
     }
 });
-
-// Add basic authentication
-app.use(basicAuth({
-    users: { 
-        [process.env.ADMIN_USER]: process.env.ADMIN_PASSWORD 
-    },
-    challenge: true,
-    realm: 'Invoice Generator'
-}));
 
 // Routes
 app.get('/invoice', (req, res) => {
