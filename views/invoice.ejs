@@ -65,7 +65,9 @@
             e.preventDefault();
             
             const formData = new FormData(this);
-            
+            const generateButton = document.querySelector('button[type="submit"]');
+            generateButton.textContent = 'Generating...';
+
             try {
                 const response = await fetch('/generate-invoice', {
                     method: 'POST',
@@ -76,10 +78,8 @@
                     throw new Error('Network response was not ok');
                 }
 
-                // Check if the response is a PDF
                 const contentType = response.headers.get('content-type');
                 if (contentType && contentType.includes('application/pdf')) {
-                    // Handle PDF download
                     const blob = await response.blob();
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
@@ -90,7 +90,6 @@
                     window.URL.revokeObjectURL(url);
                     a.remove();
                 } else {
-                    // Handle error response
                     const data = await response.json();
                     if (!data.success) {
                         throw new Error(data.error);
@@ -99,6 +98,8 @@
             } catch (error) {
                 console.error('Error:', error);
                 alert('Error generating invoice: ' + error.message);
+            } finally {
+                generateButton.textContent = 'Generate Invoice';
             }
         });
     </script>

@@ -24,6 +24,10 @@ function addLineItem() {
 document.getElementById('invoiceForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.innerHTML = 'Generating...';
+    
     // Gather all form data
     const formData = new FormData();
     
@@ -54,32 +58,30 @@ document.getElementById('invoiceForm').addEventListener('submit', async (e) => {
     }
     
     try {
-        // Show loading state
-        const submitButton = e.target.querySelector('button[type="submit"]');
-        submitButton.disabled = true;
-        submitButton.innerHTML = 'Generating...';
-        
-        // Send to server
         const response = await fetch('/generate-invoice', {
             method: 'POST',
             body: formData
         });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            // Show success message with download link
-            alert('Invoice generated successfully!');
-            if (result.pdfUrl) {
-                window.open(result.pdfUrl, '_blank');
-            }
-        } else {
-            throw new Error(result.error || 'Failed to generate invoice');
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
         }
+
+        // Handle the PDF response directly
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `invoice-${Date.now()}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+        
     } catch (error) {
+        console.error('Error:', error);
         alert('Error generating invoice: ' + error.message);
     } finally {
-        // Reset
         submitButton.disabled = false;
         submitButton.innerHTML = 'Generate Invoice';
     }
