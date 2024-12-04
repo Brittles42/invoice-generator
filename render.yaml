@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: invoice-generator
+    env: node
+    buildCommand: npm install
+    startCommand: node app.js
+    envVars:
+      - key: BASIC_AUTH_USER
+        sync: false
+      - key: BASIC_AUTH_PASS
+        sync: false
+      - key: PAYPAL_EMAIL
+        sync: false
+      - key: VENMO_HANDLE
+        sync: false
+      - key: ZELLE_EMAIL
+        sync: false
+      - key: CASHAPP_HANDLE
+        sync: false 
