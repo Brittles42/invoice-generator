@@ -56,10 +56,4 @@ The following dependencies are required to run the project:
 }
 ```
 
-To install all dependencies from a fresh clone then run:
 
-```bash
-npm install
-```
-
-This will install all dependencies listed in the `package.json` file.
