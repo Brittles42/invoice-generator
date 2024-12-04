@@ -4,6 +4,10 @@ services:
     env: node
     buildCommand: npm install
     startCommand: node app.js
+    disk:
+      name: uploads
+      mountPath: /opt/render/project/src/uploads
+      sizeGB: 0.5
     envVars:
       - key: BASIC_AUTH_USER
         sync: false
