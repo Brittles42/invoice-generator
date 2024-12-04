@@ -1,12 +1,11 @@
 # Invoice Generator
 
-A web-based invoice generator with PDF creation and email capabilities.
+A web-based invoice generator with PDF creation with hyperlinked payment options. 
 
 ## Features
 - Generate professional PDF invoices
 - Upload work images
-- Email invoices automatically
-- PayPal payment integration
+- Venmo payment integration
 - Line item management
 - License and insurance information
 - Client information management
@@ -57,10 +56,4 @@ The following dependencies are required to run the project:
 }
 ```
 
-To install all dependencies from a fresh clone, someone would just need to run:
 
-```bash
-npm install
-```
-
-This will install all dependencies listed in the `package.json` file.
