@@ -60,5 +60,48 @@
     </div>
 
     <script src="/js/invoice.js"></script>
+    <script>
+        document.getElementById('invoiceForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const generateButton = document.querySelector('button[type="submit"]');
+            generateButton.textContent = 'Generating...';
+
+            try {
+                const response = await fetch('/generate-invoice', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/pdf')) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `invoice-${Date.now()}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    a.remove();
+                } else {
+                    const data = await response.json();
+                    if (!data.success) {
+                        throw new Error(data.error);
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error generating invoice: ' + error.message);
+            } finally {
+                generateButton.textContent = 'Generate Invoice';
+            }
+        });
+    </script>
 </body>
 </html> 
