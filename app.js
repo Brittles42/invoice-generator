@@ -6,6 +6,17 @@ const fs = require('fs');
 const basicAuth = require('express-basic-auth');
 const app = express();
 
+// Ensure both directories exist
+const uploadDir = path.join(__dirname, 'uploads');
+const publicDir = path.join(__dirname, 'public');
+
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+}
+if (!fs.existsSync(publicDir)) {
+    fs.mkdirSync(publicDir);
+}
+
 // Set up multer for file uploads
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
@@ -50,10 +61,10 @@ app.get('/', (req, res) => {
     res.render('invoice');
 });
 
-app.post('/generate-invoice', upload.array('workImages'), async (req, res) => {
+app.post('/generate-invoice', upload.array('workImages', 10), async (req, res) => {
     try {
         const invoiceNumber = Date.now();
-        const pdfPath = path.join(__dirname, 'public', 'invoices', `invoice-${invoiceNumber}.pdf`);
+        const pdfPath = path.join(uploadDir, `invoice-${invoiceNumber}.pdf`);
         
         const doc = new PDFDocument({
             size: 'A4',
@@ -258,12 +269,28 @@ app.post('/generate-invoice', upload.array('workImages'), async (req, res) => {
             });
         });
 
+        // Generate PDF with a unique filename
+        const filename = `invoice-${Date.now()}.pdf`;
+        const pdfPath = path.join(uploadDir, filename);
+        
+        // Save the PDF
+        await doc.pipe(fs.createWriteStream(pdfPath));
+        await doc.end();
+
+        // Send the PDF directly to the client
+        res.download(pdfPath, filename, (err) => {
+            if (err) {
+                console.error('Error sending file:', err);
+                res.status(500).send('Error downloading file');
+            }
+            // Optionally cleanup the file after sending
+            fs.unlink(pdfPath, (unlinkErr) => {
+                if (unlinkErr) console.error('Error cleaning up file:', unlinkErr);
+            });
+        });
     } catch (error) {
         console.error('Error generating invoice:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to generate invoice'
-        });
+        res.status(500).json({ success: false, error: error.message });
     }
 });
 
