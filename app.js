@@ -52,7 +52,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Routes
-app.get('/invoice', (req, res) => {
+app.get('/', (req, res) => {
     res.render('invoice');
 });
 
