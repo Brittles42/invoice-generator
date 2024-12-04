@@ -3,7 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
-const nodemailer = require('nodemailer');
+const basicAuth = require('express-basic-auth');
 const app = express();
 
 // Set up multer for file uploads
@@ -42,14 +42,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
-// Add email configuration
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER, // Add your email
-        pass: process.env.EMAIL_PASS  // Add your app password
-    }
-});
+// Add basic auth
+app.use(basicAuth({
+    users: { 
+        [process.env.BASIC_AUTH_USER]: process.env.BASIC_AUTH_PASS 
+    },
+    challenge: true,
+    realm: 'Invoice Generator'
+}));
 
 // Routes
 app.get('/', (req, res) => {
