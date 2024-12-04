@@ -67,16 +67,15 @@ document.getElementById('invoiceForm').addEventListener('submit', async (e) => {
             throw new Error('Network response was not ok');
         }
 
-        // Handle the PDF response directly
+        // Let the browser handle the PDF download naturally
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `invoice-${Date.now()}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        a.remove();
+        window.location.href = url;
+        
+        // Clean up the URL after a short delay
+        setTimeout(() => {
+            window.URL.revokeObjectURL(url);
+        }, 100);
         
     } catch (error) {
         console.error('Error:', error);
