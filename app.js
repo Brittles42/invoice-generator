@@ -63,8 +63,9 @@ app.get('/', (req, res) => {
 
 app.post('/generate-invoice', upload.array('workImages', 10), async (req, res) => {
     try {
-        const invoiceNumber = Date.now();
-        const pdfPath = path.join(uploadDir, `invoice-${invoiceNumber}.pdf`);
+        // Generate PDF with a unique filename
+        const filename = `invoice-${Date.now()}.pdf`;
+        const pdfPath = path.join(uploadDir, filename);
         
         const doc = new PDFDocument({
             size: 'A4',
@@ -95,7 +96,7 @@ app.post('/generate-invoice', upload.array('workImages', 10), async (req, res) =
         // Invoice details
         doc.fontSize(10)
            .fillColor('#333333')
-           .text(`Invoice #: ${invoiceNumber}`, { align: 'right' })
+           .text(`Invoice #: ${Date.now()}`, { align: 'right' })
            .text(`Date: ${new Date().toLocaleDateString()}`, { align: 'right' })
            .moveDown(2);
 
@@ -264,16 +265,12 @@ app.post('/generate-invoice', upload.array('workImages', 10), async (req, res) =
         writeStream.on('finish', () => {
             res.json({
                 success: true,
-                invoiceId: invoiceNumber,
-                pdfUrl: `/invoices/invoice-${invoiceNumber}.pdf`
+                invoiceId: Date.now(),
+                pdfUrl: `/invoices/invoice-${Date.now()}.pdf`
             });
         });
 
-        // Generate PDF with a unique filename
-        const filename = `invoice-${Date.now()}.pdf`;
-        const pdfPath = path.join(uploadDir, filename);
-        
-        // Save the PDF
+        // Save and send the PDF
         await doc.pipe(fs.createWriteStream(pdfPath));
         await doc.end();
 
@@ -283,7 +280,7 @@ app.post('/generate-invoice', upload.array('workImages', 10), async (req, res) =
                 console.error('Error sending file:', err);
                 res.status(500).send('Error downloading file');
             }
-            // Optionally cleanup the file after sending
+            // Cleanup
             fs.unlink(pdfPath, (unlinkErr) => {
                 if (unlinkErr) console.error('Error cleaning up file:', unlinkErr);
             });
