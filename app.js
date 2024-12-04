@@ -53,14 +53,10 @@ app.use(basicAuth({
 
 // Routes
 app.get('/', (req, res) => {
-    res.redirect('/invoice');
-});
-
-app.get('/invoice', (req, res) => {
     res.render('invoice');
 });
 
-app.post('/generate-invoice', upload, async (req, res) => {
+app.post('/generate-invoice', upload.array('workImages'), async (req, res) => {
     try {
         const invoiceNumber = Date.now();
         const pdfPath = path.join(__dirname, 'public', 'invoices', `invoice-${invoiceNumber}.pdf`);
