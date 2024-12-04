@@ -9,7 +9,7 @@ const app = express();
 // Set up multer for file uploads
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
-        cb(null, './public/uploads/');
+        cb(null, 'uploads/');
     },
     filename: function(req, file, cb) {
         cb(null, 'work-image-' + Date.now() + path.extname(file.originalname));
@@ -17,24 +17,18 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({
-    storage: multer.diskStorage({
-        destination: 'uploads/',
-        filename: function (req, file, cb) {
-            cb(null, Date.now() + '-' + file.originalname)
-        }
-    }),
+    storage: storage,
     limits: {
-        files: 10, // Maximum number of files
+        files: 10,
         fileSize: 5 * 1024 * 1024 // 5MB limit per file
     },
     fileFilter: function (req, file, cb) {
-        // Accept images only
         if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
             return cb(new Error('Only image files are allowed!'), false);
         }
         cb(null, true);
     }
-}).array('workImages', 10);
+});
 
 // Middleware
 app.use(express.json());
