@@ -259,32 +259,24 @@ app.post('/generate-invoice', upload.array('workImages', 10), async (req, res) =
                align: 'center'
            });
 
-        // Finalize PDF
+        // Finalize PDF - only call doc.end() once!
         doc.end();
 
+        // Wait for the write stream to finish
         writeStream.on('finish', () => {
-            res.json({
-                success: true,
-                invoiceId: Date.now(),
-                pdfUrl: `/invoices/invoice-${Date.now()}.pdf`
+            // Send the PDF directly to the client
+            res.download(pdfPath, filename, (err) => {
+                if (err) {
+                    console.error('Error sending file:', err);
+                    res.status(500).send('Error downloading file');
+                }
+                // Cleanup
+                fs.unlink(pdfPath, (unlinkErr) => {
+                    if (unlinkErr) console.error('Error cleaning up file:', unlinkErr);
+                });
             });
         });
 
-        // Save and send the PDF
-        await doc.pipe(fs.createWriteStream(pdfPath));
-        await doc.end();
-
-        // Send the PDF directly to the client
-        res.download(pdfPath, filename, (err) => {
-            if (err) {
-                console.error('Error sending file:', err);
-                res.status(500).send('Error downloading file');
-            }
-            // Cleanup
-            fs.unlink(pdfPath, (unlinkErr) => {
-                if (unlinkErr) console.error('Error cleaning up file:', unlinkErr);
-            });
-        });
     } catch (error) {
         console.error('Error generating invoice:', error);
         res.status(500).json({ success: false, error: error.message });
