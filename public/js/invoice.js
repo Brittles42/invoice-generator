@@ -61,9 +61,42 @@ document.getElementById('invoiceForm').addEventListener('submit', async (e) => {
     window.invoiceFormData = formData;
     
     try {
-        await fetch('/generate-invoice');
+        const response = await fetch('/generate-invoice', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        
+        // Check if it's a mobile device
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        
+        if (isMobile) {
+            // For mobile: Open in new tab
+            window.open(url, '_blank');
+        } else {
+            // For desktop: Download
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `invoice-${Date.now()}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+        
+        // Cleanup
+        setTimeout(() => {
+            window.URL.revokeObjectURL(url);
+        }, 100);
+        
     } catch (error) {
         console.error('Error:', error);
+        alert('Error generating invoice: ' + error.message);
     } finally {
         submitButton.disabled = false;
         submitButton.innerHTML = 'Generate Invoice';
