@@ -57,9 +57,9 @@ app.use(basicAuth({
 }));
 
 // Routes
-app.get('/', (req, res) => {
-    res.render('invoice');
-});
+//app.get('/', (req, res) => {
+//   res.render('invoice');
+//});
 
 app.post('/generate-invoice', upload.array('workImages', 10), async (req, res) => {
     try {
