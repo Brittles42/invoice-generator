@@ -69,14 +69,14 @@
             generateButton.textContent = 'Generating...';
 
             try {
-                const response = await fetch('/generate-invoice', {
-                    method: 'POST',
-                    body: formData
-                });
+                //const response = await fetch('/generate-invoice', {
+                    //method: 'POST',
+                    //body: formData
+                //});
 
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
+                //if (!response.ok) {
+                    //throw new Error('Network response was not ok');
+                //}
 
                 const contentType = response.headers.get('content-type');
                 if (contentType && contentType.includes('application/pdf')) {
@@ -85,7 +85,7 @@
                     const a = document.createElement('a');
                     a.href = url;
                     a.download = `invoice-${Date.now()}.pdf`;
-                    //document.body.appendChild(a);
+                    document.body.appendChild(a);
                     a.click();
                     window.URL.revokeObjectURL(url);
                     a.remove();
