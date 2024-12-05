@@ -61,38 +61,9 @@ document.getElementById('invoiceForm').addEventListener('submit', async (e) => {
     window.invoiceFormData = formData;
     
     try {
-        const response = await fetch('/generate-invoice', {
-            method: 'POST',
-            body: formData
-        });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        
-        // Create invisible iframe for download
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        document.body.appendChild(iframe);
-        
-        // Write to iframe and trigger download
-        iframe.contentWindow.document.write(`
-            <a id="download" href="${url}" download="invoice-${Date.now()}.pdf"></a>
-        `);
-        iframe.contentWindow.document.getElementById('download').click();
-        
-        // Cleanup
-        setTimeout(() => {
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(iframe);
-        }, 1000);
-        
+        await fetch('/generate-invoice');
     } catch (error) {
         console.error('Error:', error);
-        alert('Error generating invoice: ' + error.message);
     } finally {
         submitButton.disabled = false;
         submitButton.innerHTML = 'Generate Invoice';
